@@ -1,0 +1,25 @@
+data_filepath:
+  train:
+    "./Data/data_num_4000_r_1.5/v_25/train"
+  val:
+    "./Data/data_num_4000_r_1.5/v_25/val"
+  test:
+    "./Data/data_num_4000_r_1.5/v_25/test"
+
+log_dirpath:
+  train:
+    "./logs/train_loss"
+  val:
+    "./logs/val_acc"
+weights_dirpath:
+  transformer:
+    "./Weights/Transformer/"
+  dnn:
+    "./Weights/DNN/"
+weights_name:
+  transformer:
+    "Model_Transformer_brownian_n_4000_r_1.5_v_25.pth"
+  dnn:
+    "Model_DNN_1layers_brownian_n_4000_r_1.5_v_25.pth"
+
+

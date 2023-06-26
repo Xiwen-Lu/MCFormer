@@ -1,0 +1,13 @@
+/.idea
+/references
+/settings/settings_aoji.yaml
+/Weights/Transformer/Model_Transformer_aoji.pth
+/Weights/DNN/Model_DNN_2*
+/Weights/DNN/Model_DNN_3*
+/Weights/DNN/Model_DNN_4*
+/Weights/DNN/Model_DNN_5*
+/Data/data_temp
+/Data/old_simulate_data
+/Data/data_aoji
+
+./MplStyle.yaml
