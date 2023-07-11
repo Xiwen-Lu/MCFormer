@@ -12,7 +12,7 @@ import yaml
 import os
 
 def test_currunt_model(settings):
-    print("=====Start Test=====")
+    print("======Start Test DNN======")
     model = torch.load(os.path.join(settings['weights_dirpath']['dnn'], settings['weights_name']['dnn']))
     testdataset = ChannelDataset(settings['data_filepath']['test'],batch_length=100,is_slide=False,transforms=None)
     testLoader = DataLoader(testdataset, batch_size=1000, shuffle=False)
@@ -57,7 +57,7 @@ def train(settings,nlayer=3):
     criterion=nn.MSELoss()
 
     losses=[]
-    BERs=[]
+    val_accs=[]
     best_score = 0
     t = trange(500*n_layers)
     # without BatchNormalization and Dropout, then can drop .train() and .eval()
@@ -95,22 +95,23 @@ def train(settings,nlayer=3):
             score = score / total_num
             if score > best_score:
                 best_score = score
-                torch.save(model,os.path.join(settings['weights_dirpath']['dnn'],settings['weights_name']))
+                torch.save(model,os.path.join(settings['weights_dirpath']['dnn'],settings['weights_name']['dnn']))
 
         t.set_postfix({'loss':"{:.6f}".format(loss.item()),'val_acc':"{:.4f}".format(score*100)})
         # schedule.step(loss.item())
         losses.append(loss.item())
-        BERs.append(1-score)
+        val_accs.append(score*100)
 
-    np.save(os.path.join(settings['log_dirpath']['train'],settings['weights_name']),np.array([losses,BERs]))
+    np.save(os.path.join(settings['log_dirpath']['train'],settings['weights_name']['dnn']),np.array(losses))
+    np.save(os.path.join(settings['log_dirpath']['val'],settings['weights_name']['dnn']),np.array(val_accs))
     print("Best score: {:.6f}\nError rate: {:.6f}".format(best_score*100, 1 - best_score))
 
 if __name__ == '__main__':
     nlayers = 1
     for v in [20,25,30,35,40,45,50]:
-        settings_name = "./settings_{}.yaml".format(v)
+        settings_name = "./settings/settings_{}.yaml".format(v)
         settings = yaml.safe_load(open(settings_name))
-        settings['weights_name'] = "Model_DNN_{}layers_brownian_n_4000_r_1.5_v_{}.pth".format(nlayers, v)
+        settings['weights_name']['dnn'] = "Model_DNN_{}layers_brownian_n_4000_r_1.5_v_{}.pth".format(nlayers, v)
         print("[v: {} \t nlayers: {}]--------".format(v, nlayers))
         train(settings=settings, nlayer=nlayers)
         _ = test_currunt_model(settings=settings)

@@ -284,7 +284,7 @@ def one_hot(data: np.ndarray, ncols=2):
     return out.reshape((shape[0], shape[1], ncols))
 
 def test_currunt_model(settings):
-    print("=====Start Test=====")
+    print("======Start Test MCFormer======")
     mcformer_model = torch.load(os.path.join(settings['weights_dirpath']['mcformer'], settings['weights_name']['mcformer']))
     testdataset = ChannelDataset(settings['data_filepath']['test'],batch_length=1000,is_slide=False,transforms=None)
     testLoader = DataLoader(testdataset, batch_size=40, shuffle=False)
@@ -396,5 +396,5 @@ def train_mcformer(settings,nlayers=3,nfeedforward=128):
     print("Best score: {:.6f}\nError rate: {:.6f}".format(best_score*100, 1 - best_score))
 
 if __name__ == '__main__':
-    # train_mcformer(yaml.safe_load(open("./settings/settings_aoji.yaml")),nlayers=3)
-    test_currunt_model(yaml.safe_load(open("./settings/settings_aoji.yaml")))
+    # train_mcformer(yaml.safe_load(open("./settings/settings_20.yaml")),nlayers=3)
+    test_currunt_model(yaml.safe_load(open("./settings/settings_20.yaml")))

@@ -297,11 +297,11 @@ def draw_pic_SNR_results(results_file_path,colormap="Accent"):
     plt.show()
 
 if __name__ == '__main__':
-    draw_3d_brownian_simulation(simulation_data_path='pics/pic_datas/d=10.0,r=2.5,num=500,iterations=1.npy',
-                                slice=50,
-                                elevation_angle=0,
-                                azimuthal_angle=-90,
-                                is_generate_gif=False)
+    # draw_3d_brownian_simulation(simulation_data_path='pics/pic_datas/d=10.0,r=2.5,num=500,iterations=1.npy',
+    #                             slice=50,
+    #                             elevation_angle=0,
+    #                             azimuthal_angle=-90,
+    #                             is_generate_gif=False)
     # draw_pic_data_simulations(N_hit_all_path='pics/pic_datas/data_simulation_nhit_all.npy',
     #                           N_hit_avg_path='pics/pic_datas/num_hit_avg.npy',
     #                           N_hit_and_signal_path='pics/pic_datas/data_simulation_nhit_sample.npy',
@@ -328,6 +328,6 @@ if __name__ == '__main__':
     #                         ylabel="Validation Accuracy",
     #                         save_filename="results_accs")
 
-    # draw_pic_SNR_results(results_file_path='pics/pic_datas/SNR_results.csv',
-    #                      colormap=cmap)
+    draw_pic_SNR_results(results_file_path='pics/pic_datas/SNR_results.csv',
+                         colormap=cmap)
     print("Picture Drawing Finish.")

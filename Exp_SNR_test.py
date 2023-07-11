@@ -6,7 +6,6 @@ Time    : 6/15/23 12:59 PM
 Desc    : test the BER under different SNR by using MCFormer and MAP
 """
 import math
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -42,16 +41,9 @@ def generate_SNR_data(src_data,dst_file,SNRs):
         noise_var = pow(signal_mean,2) / (10 ** (SNR / 10))
         noise = np.random.normal(0, math.sqrt(noise_var), len(data))
         signal += noise
-        # plt.plot(noise)
-        # plt.title("{}".format(SNR))
-        # plt.show()
-        # print(np.where(signal<0))
         signal[signal<0] = 0
         alldata[1] = signal
         alldata = alldata.astype(int)
-        # plt.plot(alldata[1])
-        # plt.title("data{}".format(SNR))
-        # plt.show()
         np.save(dst_file+'snr_{}/snr_{}'.format(SNR,SNR),alldata)
 
 
@@ -59,7 +51,7 @@ def MCFormer_SNR_test(SNRs):
     results = np.asarray(SNRs,float)
     settings = yaml.safe_load(open("./settings/settings_40.yaml"))
     for SNR in SNRs:
-        print("========{}===========".format(SNR))
+        print("======SNR: {}======".format(SNR))
         settings['data_filepath']['test'] = "./Data/data_num_4000_r_1.5_SNR_v40/snr_{}".format(SNR)
         BER = test_currunt_model(settings=settings)
         results[SNRs==SNR]=BER
@@ -71,11 +63,10 @@ def MAP_SNR_test(SNRs,file_folder):
     for SNR in SNRs:
         N_hit_sample = np.load(os.path.join(file_folder,"snr_{}/snr_{}.npy".format(SNR,SNR)))
         signals = np.array(N_hit_sample[0])
-        # p_true = true_signal_probability(signals,configs=configs)
         signals_hat = calc_MAP_sequence(N_hit_sample[1],configs,L=10)
         wrong_signals_array = np.bitwise_xor(signals.astype(bool),signals_hat.astype(bool))
         BER = np.sum(wrong_signals_array) / len(signals)
-        print("The BER is {} at SNR {}".format(BER,SNR))
+        print("The MAP BER is {} at SNR {}".format(BER,SNR))
         results[SNRs==SNR]=BER
     return results
 
@@ -83,8 +74,8 @@ def DNN_SNR_test(SNRs):
     results = np.asarray(SNRs,float)
     settings = yaml.safe_load(open("./settings/settings_40.yaml"))
     for SNR in SNRs:
+        print("======SNR: {}======".format(SNR))
         settings['data_filepath']['test'] = "./Data/data_num_4000_r_1.5_SNR_v40/snr_{}".format(SNR)
-        settings['weights_name']['dnn'] = 'Model_DNN_1layers_brownian_n_4000_r_1.5_v_40.pth'
         BER = train_DNN.test_currunt_model(settings=settings)
         results[SNRs==SNR]=BER
     return results

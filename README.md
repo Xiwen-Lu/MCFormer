@@ -4,7 +4,6 @@ This repository is for the paper "MCFormer: A Transformer-Based Detector for Mol
 
 ## file structure
 
-
 | file folder | usage                                                                |
 | ----------- | -------------------------------------------------------------------- |
 | /Data/      | the data used in paper experiments                                   |
@@ -12,7 +11,6 @@ This repository is for the paper "MCFormer: A Transformer-Based Detector for Mol
 | /pics/      | the pictures drawn by experiment data                                |
 | /settings/  | different settings for model running with different drift velocity v |
 | /Weights/   | Weights file for the trained model                                   |
-
 
 | python file                       | usage                                                       |
 | --------------------------------- | ----------------------------------------------------------- |
@@ -27,6 +25,12 @@ This repository is for the paper "MCFormer: A Transformer-Based Detector for Mol
 | Exp_SNR_test                      | the BER experiment under unknown channel noise              |
 
 <!--## Replication of experimental results-->
+
+## Usage
+
+The required data can be generated using **data_generate_BrownianMotion.py**, and a custom configuration **settings.yaml** file can be used for DNN or MCFormer models to call data and store models.
+
+If you want to reproduce the experiments in the paper, you can run **Exp_BER_test.py** and **Exp_SNR_test.py** directly.
 
 ## More details about data generation algorithm
 
@@ -66,3 +70,8 @@ The more details can be seen below:
 **step 10** : By sampling the final sequence Ntotal, get the received sequence N, e.g. N=[4,4,3,0,0].
 
 ![step10](./pics/readme_pics/step10.png)
+
+## Representations
+
+All authors using this work need to cite this article
+

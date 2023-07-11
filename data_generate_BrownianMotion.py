@@ -241,12 +241,11 @@ if __name__ == '__main__':
     random_samples = 1
     # to generate different data, this code should be put in the loop
     # release_signals = np.random.binomial(1, 0.5, release_times)
-    # release_signals = np.array([1,0,0,1,1,1,0,1])
-    release_signals = np.ones(release_times)
+    # release_signals = np.ones(release_times)
 
 
     for j in range(random_samples):
-        # release_signals = np.random.binomial(1, 0.5, release_times)
+        release_signals = np.random.binomial(1, 0.5, release_times)
         single_start_time = time.time()
         num_hit, num_hit_sample = BrownianMotionAndDrift(configs,release_signals,file_folder="./Data/speed_test/")
         single_end_time = time.time()
