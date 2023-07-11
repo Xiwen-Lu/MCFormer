@@ -13,7 +13,7 @@ import pandas as pd
 import scipy.stats
 
 import train_DNN
-from Model_Transformer import *
+from Model_MCFormer import *
 from calculate_MAP_sequence_accelerate import *
 
 import yaml

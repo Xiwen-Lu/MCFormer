@@ -65,8 +65,8 @@ def draw_3d_brownian_simulation(simulation_data_path, slice=50, elevation_angle=
     # plt.gca().set_box_aspect((3, 5, 2))
     plt.axis('off')
     plt.gca().view_init(elev=elevation_angle, azim=azimuthal_angle)
-    plt.savefig('pics/MC_system3.svg', bbox_inches='tight', dpi=600, format='svg')
-    title = plt.title("radius={},slice={}".format(r, slice))
+    plt.savefig('pics/MC_system.svg', bbox_inches='tight', dpi=600, format='svg')
+    # title = plt.title("radius={},slice={}".format(r, slice))
     plt.show()
 
     if is_generate_gif:
@@ -278,15 +278,15 @@ def draw_pic_losses_results(results_losses_path,colormap="Accent",
     plt.ylabel(ylabel)
     handles, labels = ax.get_legend_handles_labels()
     ax.legend(handles, [r'$v=20$', r'$v=25$', r'$v=30$', r'$v=35$', r'$v=40$', r'$v=45$', r'$v=50$'])
-    plt.savefig(paper_pic_filefolder + '{}.eps'.format(save_filename), dpi=600, bbox_inches='tight', format='eps')
-    plt.savefig('pics/{}.svg'.format(save_filename), dpi=600, bbox_inches='tight', format='svg')
+    # plt.savefig(paper_pic_filefolder + '{}.eps'.format(save_filename), dpi=600, bbox_inches='tight', format='eps')
+    plt.savefig('pics/{}.pdf'.format(save_filename), dpi=600, bbox_inches='tight', format='pdf')
     plt.show()
 
 def draw_pic_SNR_results(results_file_path,colormap="Accent"):
     plt.figure(figsize=(4, 2.8))
     df = pd.read_csv(results_file_path)
     df.plot(x='SNR', y=['MCFormer', 'MAP', 'DNN'], logy=True, colormap=colormap
-            , kind='line',style=['+--', '.:', 'o-'])
+            , kind='line',style=['.-', '+:', "2--"])
     plt.ylabel("BER")
     plt.xlabel("SNR (dB)")
     label = np.array(df['SNR']).astype(int)
@@ -297,11 +297,11 @@ def draw_pic_SNR_results(results_file_path,colormap="Accent"):
     plt.show()
 
 if __name__ == '__main__':
-    # draw_3d_brownian_simulation(simulation_data_path='pics/pic_datas/d=10.0,r=2.5,num=500,iterations=1.npy',
-    #                             slice=50,
-    #                             elevation_angle=0,
-    #                             azimuthal_angle=-90,
-    #                             is_generate_gif=False)
+    draw_3d_brownian_simulation(simulation_data_path='pics/pic_datas/d=10.0,r=2.5,num=500,iterations=1.npy',
+                                slice=50,
+                                elevation_angle=0,
+                                azimuthal_angle=-90,
+                                is_generate_gif=False)
     # draw_pic_data_simulations(N_hit_all_path='pics/pic_datas/data_simulation_nhit_all.npy',
     #                           N_hit_avg_path='pics/pic_datas/num_hit_avg.npy',
     #                           N_hit_and_signal_path='pics/pic_datas/data_simulation_nhit_sample.npy',
@@ -311,12 +311,12 @@ if __name__ == '__main__':
     #                             elevation_angle=20,
     #                             azimuthal_angle=-60)
     # draw_pic_attention(datafilepath='logs/embeddings.npy')
-    draw_pic_data_boxplot(N_hit_and_signal_data_path='pics/pic_datas/data_boxplot_v.csv',
-                    classify='v')
+    # draw_pic_data_boxplot(N_hit_and_signal_data_path='pics/pic_datas/data_boxplot_v.csv',
+    #                 classify='v')
 
     cmap='Accent'
-    draw_pic_BER_results(results_file_path='pics/pic_datas/BER_results.csv',
-                         colormap=cmap)
+    # draw_pic_BER_results(results_file_path='pics/pic_datas/BER_results.csv',
+    #                      colormap=cmap)
     # draw_pic_nlayers_results(results_file_path='pics/pic_datas/nlayers_results.csv',
     #                          colormap=cmap)
     # draw_pic_losses_results(results_losses_path='pics/pic_datas/losses_results.csv',
@@ -328,6 +328,6 @@ if __name__ == '__main__':
     #                         ylabel="Validation Accuracy",
     #                         save_filename="results_accs")
 
-    draw_pic_SNR_results(results_file_path='pics/pic_datas/SNR_results.csv',
-                         colormap=cmap)
+    # draw_pic_SNR_results(results_file_path='pics/pic_datas/SNR_results.csv',
+    #                      colormap=cmap)
     print("Picture Drawing Finish.")

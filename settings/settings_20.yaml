@@ -12,13 +12,13 @@ log_dirpath:
   val:
     "./logs/val_acc"
 weights_dirpath:
-  transformer:
-    "./Weights/Transformer/"
+  mcformer:
+    "./Weights/MCFormer/"
   dnn:
     "./Weights/DNN/"
 weights_name:
-  transformer:
-    "Model_Transformer_brownian_n_4000_r_1.5_v_20.pth"
+  mcformer:
+    "Model_MCFormer_brownian_n_4000_r_1.5_v_20.pth"
   dnn:
     "Model_DNN_1layers_brownian_n_4000_r_1.5_v_20.pth"
 

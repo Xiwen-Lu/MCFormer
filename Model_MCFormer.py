@@ -22,7 +22,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 # torch.cuda.set_device(1)
 # device = "cpu"
 
-# Transformer Parameters
+# MCformer Parameters
 
 embeddings = []
 
@@ -246,9 +246,9 @@ class Decoder(nn.Module):
         return dec_outputs, dec_self_attns, dec_enc_attns
 
 
-class Transformer(nn.Module):
+class MCFormer(nn.Module):
     def __init__(self, src_vocab_size, tgt_vocab_size, d_model=64, n_layers=3, n_heads=4,d_k=16,d_v=16, d_feedforward=512):
-        super(Transformer, self).__init__()
+        super(MCFormer, self).__init__()
         self.encoder = Encoder(d_model=d_model, n_layers=n_layers, d_feedforward=d_feedforward, n_heads=n_heads,d_k=d_k,d_v=d_v, src_vocab_size=src_vocab_size).to(device)
         self.decoder = Decoder(d_model=d_model, n_layers=n_layers, d_feedforward=d_feedforward, n_heads=n_heads,d_k=d_k,d_v=d_v, tgt_vocab_size=tgt_vocab_size).to(device)
         self.projection = nn.Linear(d_model, tgt_vocab_size, bias=False)
@@ -285,14 +285,14 @@ def one_hot(data: np.ndarray, ncols=2):
 
 def test_currunt_model(settings):
     print("=====Start Test=====")
-    transformer_model = torch.load(os.path.join(settings['weights_dirpath']['transformer'], settings['weights_name']['transformer']))
+    mcformer_model = torch.load(os.path.join(settings['weights_dirpath']['mcformer'], settings['weights_name']['mcformer']))
     testdataset = ChannelDataset(settings['data_filepath']['test'],batch_length=1000,is_slide=False,transforms=None)
     testLoader = DataLoader(testdataset, batch_size=40, shuffle=False)
 
     batch_seq_length = 100
     score = 0
     total_num = 0
-    transformer_model.eval()
+    mcformer_model.eval()
     for batch_x, batch_y in testLoader:
         batch_y = batch_y.reshape([-1, batch_seq_length])
         batch_x = batch_x.reshape([-1, batch_seq_length])
@@ -301,7 +301,7 @@ def test_currunt_model(settings):
         Y = batch_y.detach().numpy()
         batch_y = batch_y.type(torch.IntTensor).to(device)
         batch_x = batch_x.type(torch.IntTensor).to(device)
-        pre_y, enc_self_attns, dec_self_attns, enc_dec_attns = transformer_model(batch_x, batch_y[:, :-1])
+        pre_y, enc_self_attns, dec_self_attns, enc_dec_attns = mcformer_model(batch_x, batch_y[:, :-1])
         # pre_y = torch.softmax(pre_y, dim=1)
         Y_pre = torch.argmax(pre_y, dim=1).cpu().detach().numpy()
         # score = 100 * np.mean(Y.reshape([-1]) == Y_pre)
@@ -312,21 +312,21 @@ def test_currunt_model(settings):
     return round(1-score,4)
 
 
-def train_transformer(settings,nlayers=3,nfeedforward=128):
+def train_mcformer(settings,nlayers=3,nfeedforward=128):
     traindataset = ChannelDataset(settings['data_filepath']['train'], batch_length=1000, is_slide=True, transforms=None)
     trainLoader = DataLoader(traindataset, batch_size=60, shuffle=True)
     valdataset = ChannelDataset(settings['data_filepath']['val'], batch_length=1000, is_slide=True, transforms=None)
     valLoader = DataLoader(valdataset, batch_size=15, shuffle=False)
 
-    # transformer_model = Transformer(src_vocab_size=150,tgt_vocab_size=2,d_model=512,n_layers=3,n_heads=8,d_k=64,d_v=64,d_feedforward=1024).to(device)
-    transformer_model = Transformer(src_vocab_size=60, tgt_vocab_size=2, d_model=32, n_layers=3, n_heads=4, d_k=8,
+    # mcformer_model = MCFormer(src_vocab_size=150,tgt_vocab_size=2,d_model=512,n_layers=3,n_heads=8,d_k=64,d_v=64,d_feedforward=1024).to(device)
+    mcformer_model = MCFormer(src_vocab_size=60, tgt_vocab_size=2, d_model=32, n_layers=3, n_heads=4, d_k=8,
                                     d_v=8, d_feedforward=128).to(device)
     # modelpath = os.path.join(settings['weights_dirpath'], settings['weights_name'])
-    # transformer_model = torch.load(modelpath)
+    # mcformer_model = torch.load(modelpath)
 
     # criterion = nn.MSELoss()
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(transformer_model.parameters(), lr=0.001)
+    optimizer = optim.Adam(mcformer_model.parameters(), lr=0.001)
     # schedule = optim.lr_scheduler.ReduceLROnPlateau(optimizer,mode="min",factor=0.1,patience=5,verbose=True)
 
     best_score = 0
@@ -335,7 +335,7 @@ def train_transformer(settings,nlayers=3,nfeedforward=128):
     batch_seq_length = 100
     t = trange(50)
     for epoch in t:
-        transformer_model.train()
+        mcformer_model.train()
         loss_sum = 0
         for batch_x, batch_y in trainLoader:
             batch_y = batch_y.reshape([-1, batch_seq_length])
@@ -346,7 +346,7 @@ def train_transformer(settings,nlayers=3,nfeedforward=128):
             batch_y = torch.cat((torch.ones(batch_y.size()[0]).reshape([-1,1]),batch_y),dim=1)
             batch_x = batch_x.type(torch.LongTensor).to(device)
             batch_y = batch_y.type(torch.LongTensor).to(device)
-            pre_y, _, _, _ = transformer_model(batch_x, batch_y[:, :-1])
+            pre_y, _, _, _ = mcformer_model(batch_x, batch_y[:, :-1])
             # pre_y = torch.argmax(pre_y, dim=2)
             # tmp_y = one_hot(batch_y).reshape([-1,2])
             # tmp_y = torch.from_numpy(tmp_y).type(torch.IntTensor).to(device)
@@ -361,7 +361,7 @@ def train_transformer(settings,nlayers=3,nfeedforward=128):
         if epoch % 1 == 0:
             score = 0
             total_num = 0
-            transformer_model.eval()
+            mcformer_model.eval()
             for batch_x, batch_y in valLoader:
                 batch_y = batch_y.reshape([-1, batch_seq_length])
                 batch_x = batch_x.reshape([-1, batch_seq_length])
@@ -371,7 +371,7 @@ def train_transformer(settings,nlayers=3,nfeedforward=128):
                 Y = batch_y.detach().numpy()
                 batch_x = batch_x.type(torch.IntTensor).to(device)
                 batch_y = batch_y.type(torch.IntTensor).to(device)
-                pre_y, enc_self_attns, dec_self_attns, enc_dec_attns = transformer_model(batch_x, batch_y[:, :-1])
+                pre_y, enc_self_attns, dec_self_attns, enc_dec_attns = mcformer_model(batch_x, batch_y[:, :-1])
                 # pre_y = torch.softmax(pre_y, dim=1)
                 Y_pre = torch.argmax(pre_y, dim=1).cpu().detach().numpy()
                 # score = 100 * np.mean(Y.reshape([-1]) == Y_pre)
@@ -381,7 +381,7 @@ def train_transformer(settings,nlayers=3,nfeedforward=128):
             score = score / total_num
             val_accs.append(score * 100)
             if score > best_score:
-                torch.save(transformer_model, os.path.join(settings['weights_dirpath']['transformer'], settings['weights_name']['transformer']))
+                torch.save(mcformer_model, os.path.join(settings['weights_dirpath']['mcformer'], settings['weights_name']['mcformer']))
                 best_score = score
 
                 # schedule.step(1-score)
@@ -389,12 +389,12 @@ def train_transformer(settings,nlayers=3,nfeedforward=128):
         t.set_postfix({'train_loss': "{:.6f}".format(loss.item()), 'val_accuracy': "{}".format(score * 100)})
 
     # np.save(os.path.join(settings['log_dirpath'], 'embeddings.npy'),np.array(embeddings))
-    np.save(os.path.join(settings['log_dirpath']['train'], settings['weights_name']['transformer']), np.array(losses))
-    np.save(os.path.join(settings['log_dirpath']['val'], settings['weights_name']['transformer']), np.array(val_accs))
+    np.save(os.path.join(settings['log_dirpath']['train'], settings['weights_name']['mcformer']), np.array(losses))
+    np.save(os.path.join(settings['log_dirpath']['val'], settings['weights_name']['mcformer']), np.array(val_accs))
     # seaborn.heatmap(enc_self_attns[0][0][0][:10, :10].cpu().detach().numpy())
     # plt.show()
     print("Best score: {:.6f}\nError rate: {:.6f}".format(best_score*100, 1 - best_score))
 
 if __name__ == '__main__':
-    # train_transformer(yaml.safe_load(open("./settings/settings_aoji.yaml")),nlayers=3)
+    # train_mcformer(yaml.safe_load(open("./settings/settings_aoji.yaml")),nlayers=3)
     test_currunt_model(yaml.safe_load(open("./settings/settings_aoji.yaml")))

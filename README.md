@@ -1,29 +1,68 @@
-# Transformer Based Receiver Design in Molecular Communication : a novel insight from NLP
+# MCFormer: A Transformer-Based Detector for Molecular Communication with Accelerated Particle-Based Solution
 
-## pipeline
+This repository is for the paper "MCFormer: A Transformer-Based Detector for Molecular Communication with Accelerated Particle-Based Solution"
 
-1. generate random signal (0 or 1)
-2. caculate the probability P of the arrived signal autoinducer
-3. caculate the num of the arrived ai (autoinducer) by P
-4. minus threshold to get the receiver signal (0 or 1)
+## file structure
 
-![pipeline](./pics/pipeline.jpg)
 
-## parameters
+| file folder | usage                                                                |
+| ----------- | -------------------------------------------------------------------- |
+| /Data/      | the data used in paper experiments                                   |
+| /logs/      | the training loss and validation accuracy data                       |
+| /pics/      | the pictures drawn by experiment data                                |
+| /settings/  | different settings for model running with different drift velocity v |
+| /Weights/   | Weights file for the trained model                                   |
 
-![model](./pics/Bacterial_communication_scheme.png)
 
-## the probability function
+| python file                       | usage                                                       |
+| --------------------------------- | ----------------------------------------------------------- |
+| data_generate_BrownianMotion      | our accelerated particle-based solution for data generation |
+| dataset                           | for models to read data                                     |
+| Model_DNN                         | the DNN model                                               |
+| Model_MCFormer                    | the MCFormer model with training and testing function       |
+| train_DNN                         | for training and testing DNN model                          |
+| calculate_MAP_sequence            | the MAP calculate function                                  |
+| calculate_MAP_sequence_accelerate | the MAP calculate function with matrix operations           |
+| Exp_BER_test                      | the BER experiment with different drift velocity            |
+| Exp_SNR_test                      | the BER experiment under unknown channel noise              |
 
-![f_p](./pics/Probability_function.png)
+<!--## Replication of experimental results-->
 
-![best_threshold](./pics/best_threshold.png)
+## More details about data generation algorithm
 
-## the FCN test result
+It uses matrix operation to substantially expedite the data generation process.
+The more details can be seen below:
 
-![training_accuracy](./pics/FCN_train_accuracy.png)
+**step 1** : Calculate the effect step $K_e$，e.g. $K_e=3$.
 
-![result1](./pics/N_hit_true_with_pre.png)
+**step 2** : Iterate through the transmitted signal sequence, e.g. S=[1,1,1,0,0].
+![step2](./pics/readme_pics/step2.png)
 
-![result2](./pics/N_hit_true_with_pre_two_sets.png)
+**step 3** : For each transmitted signal si=1, create a matrix $N_{tmp}(M,K_eT)$ to save which moments particles are observed, e.g. M=4, T=5$\Delta t$.
+![step3](./pics/readme_pics/step3.png)
 
+**step 4** : Produces net displacement matrix of M particles in each moment. The net displacement in the x-axis direction obeys $\mathcal{N}\left(v\Delta t,\sqrt{2\mathrm{D}\Delta t}\right)$, and the y- and z-axis directions obey $\mathcal{N}\left(0,\sqrt{2\mathrm{D}\Delta t}\right)$, e.g. $v=30\mu m/s,\Delta t=0.04 s, T=0.2 s$.
+
+![step4](./pics/readme_pics/step4.png)
+
+**step 5** : Accumulate and obtain the coordinate matrix of the particles at each moment.
+
+![step5](./pics/readme_pics/step5.png)
+
+**step 6** : Calculate the distance between particle and the receiver center point (with the broadcast mechanism in Python.
+
+![step6](./pics/readme_pics/step6.png)
+
+**step 7** : Mark the moments where distance is less than the receiver radius as ``1" in $N_{tmp}$, for better demonstrating, here use 10 as receiver radius.
+
+![step7](./pics/readme_pics/step7.png)
+
+**step 8** : Sum along the axis of the particle (axis=1) and superimpose on the final sequence of results.
+
+![step8](./pics/readme_pics/step8.png)
+
+**step 9** : Repeat **Step 3** to **Step 9**, until the whole sequence is end.
+
+**step 10** : By sampling the final sequence Ntotal, get the received sequence N, e.g. N=[4,4,3,0,0].
+
+![step10](./pics/readme_pics/step10.png)

@@ -36,7 +36,7 @@ def probability(configs, m: int):
 
 
 def getAffectStep(configs):
-    for step in range(1, 10):
+    for step in range(1, 30):
         if probability(configs, step * configs["sample_index"]) - 0 < 1e-6 * configs["particle_num"]:
             break
 
@@ -125,8 +125,9 @@ def BrownianMotionAndDrift(configs,release_signals,file_folder="./Data/data_new_
     release_times = configs["release_times"]
     release_indexs = int(np.round(release_time / delta_t))
 
-    # affect_step = getAffectStep(configs)
-    affect_step = 5
+    affect_step = getAffectStep(configs)
+    print(affect_step)
+    affect_step = 3
 
     # create a total array than contains all the information
     num_hit = np.zeros(int(total_time / delta_t))
@@ -143,13 +144,21 @@ def BrownianMotionAndDrift(configs,release_signals,file_folder="./Data/data_new_
         # curr_release_time = int(np.round(i * release_time/delta_t))
         curr_release_time = 0
         remain_steps = total_data.shape[0] - curr_release_time - 1
-        total_data[curr_release_time + 1:, :, 0] = np.cumsum(np.random.normal(
+        tx = np.random.normal(
             velocity[0] * delta_t, math.sqrt(2 * diffusion * delta_t),
-            size=(remain_steps, particle_num)), axis=0)
-        # consider that the velocity y = z, so here otal_data.shape[0]-curr_release_time-1combain the two part
-        total_data[curr_release_time + 1:, :, 1:3] = np.cumsum(np.random.normal(
+            size=(remain_steps, particle_num))
+        total_data[curr_release_time + 1:, :, 0] = np.cumsum(tx,axis=0)
+        tyz = np.random.normal(
             velocity[1] * delta_t, math.sqrt(2 * diffusion * delta_t),
-            size=(remain_steps, particle_num, 2)), axis=0)
+            size=(remain_steps, particle_num, 2))
+        total_data[curr_release_time + 1:, :, 1:3] = np.cumsum(tyz,axis=0)
+        # total_data[curr_release_time + 1:, :, 0] = np.cumsum(np.random.normal(
+        #     velocity[0] * delta_t, math.sqrt(2 * diffusion * delta_t),
+        #     size=(remain_steps, particle_num)), axis=0)
+        # # consider that the velocity y = z, so here otal_data.shape[0]-curr_release_time-1combain the two part
+        # total_data[curr_release_time + 1:, :, 1:3] = np.cumsum(np.random.normal(
+        #     velocity[1] * delta_t, math.sqrt(2 * diffusion * delta_t),
+        #     size=(remain_steps, particle_num, 2)), axis=0)
 
         tmp = np.sqrt(np.sum((total_data[:, :, 0:3] - receiver_location) ** 2, axis=2))
         total_data[tmp < receiver_radius, 3] = 1
@@ -166,8 +175,8 @@ def BrownianMotionAndDrift(configs,release_signals,file_folder="./Data/data_new_
     # here, the start symbol from sample_index-1, to ensure the sample dots equal the signals
     num_hit_sample = num_hit[sample_index - 1::sample_index]
 
-    np.save('{}d_{}_r_{}_num_{}_velocity_{}_{}'.format(file_folder, distance, receiver_radius, particle_num, velocity,j),
-            [release_signals[:num_hit_sample.shape[0]], num_hit_sample])
+    # np.save('{}d_{}_r_{}_num_{}_velocity_{}_{}'.format(file_folder, distance, receiver_radius, particle_num, velocity,j),
+    #       [release_signals[:num_hit_sample.shape[0]], num_hit_sample])
 
     return num_hit,num_hit_sample
 
@@ -219,7 +228,7 @@ if __name__ == '__main__':
         'delta_t': 0.001,
         'total_time': 1000,
         'release_time': 0.2,
-        'velocity': [20, 0, 0]
+        'velocity': [30, 0, 0]
     }
     # computational attributes
     configs["sample_time"] = configs["release_time"]
@@ -229,39 +238,22 @@ if __name__ == '__main__':
     # release_signals = np.ones(release_times)
     num_hit_avg = np.zeros(int(configs["total_time"] / configs["delta_t"]))
     start_runing_time = time.time()
-    random_samples = 9
+    random_samples = 1
     # to generate different data, this code should be put in the loop
     # release_signals = np.random.binomial(1, 0.5, release_times)
     # release_signals = np.array([1,0,0,1,1,1,0,1])
-    # release_signals = np.ones(release_times)
+    release_signals = np.ones(release_times)
 
-    # # start plot the boxplot data
-    # j=0
-    # for c in [2000,4000,6000,8000]:
-    #     configs["particle_num"]=c
-    #     _,_ = BrownianMotionAndDrift(configs,release_signals,file_folder="./Data/data_temp/M/")
-    #
-    # configs["particle_num"] = 4000
-    # for c in [1,1.5,2,2.5]:
-    #     configs["receiver_radius"]=c
-    #     _,_ = BrownianMotionAndDrift(configs,release_signals,file_folder="./Data/data_temp/r/")
-    #
-    # configs["receiver_radius"] = 1.5
-    # for c in [20,30,40,50]:
-    #     configs["velocity"]=[c, 0, 0]
-    #     _, _ = BrownianMotionAndDrift(configs, release_signals, file_folder="./Data/data_temp/v/")
-    #
-    # print("finish")
 
     for j in range(random_samples):
-        release_signals = np.random.binomial(1, 0.5, release_times)
+        # release_signals = np.random.binomial(1, 0.5, release_times)
         single_start_time = time.time()
-        num_hit, num_hit_sample = BrownianMotionAndDrift(configs,release_signals,file_folder="./Data/test_data/")
+        num_hit, num_hit_sample = BrownianMotionAndDrift(configs,release_signals,file_folder="./Data/speed_test/")
         single_end_time = time.time()
         print("Single Simulation Finished.\tRunning time is {}.".format(single_end_time - single_start_time))
         # num_hit_avg += num_hit
     # num_hit_avg = num_hit_avg / random_samples
     end_running_time = time.time()
     # np.save('Data/data_temp/avg/num_hit_avg',num_hit_avg)
-    # draw_simulate_results(configs,num_hit,num_hit_avg,release_signals,num_hit_sample)
+    draw_simulate_results(configs,num_hit,num_hit_avg,release_signals,num_hit_sample)
     print("Simulation Finished.\nTotal running time is {}.".format(end_running_time - start_runing_time))
