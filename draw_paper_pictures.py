@@ -14,18 +14,17 @@ import pandas as pd
 import yaml
 import os
 import scipy.io
-import seaborn
+# import seaborn
 
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import font_manager, ticker
 from matplotlib.animation import FuncAnimation
 
-# plt.style.use('MyPapers.yaml')
 plt.style.use('science.yaml')
 
-paper_pic_filefolder = "/home/luxiwen/Documents/MyPapers/001-MCFormer/MCFormer_CL/pics/"
-# paper_pic_filefolder = "./pics/"
+# paper_pic_filefolder = "/home/luxiwen/Documents/MyPapers/001-MCFormer/MCFormer_CL/pics/"
+paper_pic_filefolder = "E:/MyPapers/001-MCFormer/MCFormer_CL/pics/"
 
 def update_3d_pic(frame, pic_moleculars, pic_title, positions):
     slice = frame
@@ -293,7 +292,7 @@ def draw_pic_SNR_results(results_file_path,colormap="Accent"):
     ticks = np.arange(start=10, stop=len(label)*5+10, step=5, dtype=int)
     plt.xticks(ticks=ticks, labels=label, rotation=0)
     plt.savefig(paper_pic_filefolder + 'results_SNR.pdf', dpi=600, bbox_inches='tight', format='pdf')
-    plt.savefig('pics/results_SNR.svg', dpi=600, bbox_inches='tight', format='svg')
+    plt.savefig('pics/results_SNR.eps', dpi=600, bbox_inches='tight', format='eps')
     plt.show()
 
 if __name__ == '__main__':

@@ -2,7 +2,14 @@
 
 This repository is for the paper "MCFormer: A Transformer-Based Detector for Molecular Communication with Accelerated Particle-Based Solution"
 
+[source document](https://ieeexplore.ieee.org/document/10210368)
+
+[Abstract file](https://xiwen-lu.netlify.app/publication/mcformer/)
+
+[Pdf file](https://xiwen-lu.netlify.app/publication/mcformer/mcformer.pdf)
+
 ## file structure
+
 
 | file folder | usage                                                                |
 | ----------- | -------------------------------------------------------------------- |
@@ -11,6 +18,7 @@ This repository is for the paper "MCFormer: A Transformer-Based Detector for Mol
 | /pics/      | the pictures drawn by experiment data                                |
 | /settings/  | different settings for model running with different drift velocity v |
 | /Weights/   | Weights file for the trained model                                   |
+
 
 | python file                       | usage                                                       |
 | --------------------------------- | ----------------------------------------------------------- |
@@ -75,3 +83,13 @@ The more details can be seen below:
 
 All authors using this work need to cite this article
 
+
+> @ARTICLE{10210368,
+author={Lu, Xiwen and Bai, Chenyao and Zhu, Aoji and Zhu, Yunlong and Wang, Kezhi},
+journal={IEEE Communications Letters},
+title={MCFormer: A Transformer-Based Detector for Molecular Communication with Accelerated Particle-Based Solution},
+year={2023},
+volume={},
+number={},
+pages={1-1},
+doi={10.1109/LCOMM.2023.3303091}}

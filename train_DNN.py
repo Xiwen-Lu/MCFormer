@@ -17,11 +17,9 @@ def test_currunt_model(settings):
     testdataset = ChannelDataset(settings['data_filepath']['test'],batch_length=100,is_slide=False,transforms=None)
     testLoader = DataLoader(testdataset, batch_size=1000, shuffle=False)
 
-    model.eval()
     score = 0
     total_num = 0
     model.eval()
-
     for batch_x, batch_y in testLoader:
         batch_x = normalize(batch_x.type(torch.FloatTensor), p=1, dim=1)
         X = batch_x.cuda().type(torch.cuda.FloatTensor)
